@@ -3,34 +3,34 @@ package com.klevesson.lms.api.repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.springframework.stereotype.Repository;
 
 import com.klevesson.lms.api.config.ConnectionFactory;
-import com.klevesson.lms.api.entity.User;
+import com.klevesson.lms.api.entity.Course;
 
 @Repository
-public class UserRepository {
+public class CourseRepository {
     
     private final ConnectionFactory connectionFactory;
 
-    public UserRepository(ConnectionFactory connectionFactory) {
+    public CourseRepository(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
 
-    public Long save(User user) {
+    public Long save(Course course) {
 
         final String sql = """
-            INSERT INTO users (
-                name, 
-                email, 
-                username, 
-                password_hash
-            ) VALUES (?, ?, ?, ?)
+            INSERT INTO courses (
+                slug,
+                title,
+                description,
+                lessons,
+                hours
+            ) VALUES (?, ?, ?, ?, ?)
             """;
-
+        
         try (
             Connection connection = connectionFactory.getConnection();
             PreparedStatement statement = connection.prepareStatement(
@@ -38,11 +38,12 @@ public class UserRepository {
             );
         ) {
 
-            statement.setString(1, user.getName());
-            statement.setString(2, user.getEmail());
-            statement.setString(3, user.getUsername());
-            statement.setString(4, user.getPasswordHash());
-            
+            statement.setString(1, course.getSlug());
+            statement.setString(2, course.getTitle());
+            statement.setString(3, course.getDescription());
+            statement.setLong(4, course.getLessons());
+            statement.setLong(5, course.getHours());
+
             int affectedRows = statement.executeUpdate();
 
             if (affectedRows != 1) {
@@ -52,7 +53,7 @@ public class UserRepository {
             }
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                
+
                 if (generatedKeys.next()) {
                     Long id = generatedKeys.getLong(1);
                     return id;
@@ -63,12 +64,11 @@ public class UserRepository {
                 );
             }
 
-        } catch (SQLException error) {
+        } catch (Exception error) {
             throw new RuntimeException(
                 "An error occurred while saving.",
                 error
             );
-        }
+        }        
     }
-
 }

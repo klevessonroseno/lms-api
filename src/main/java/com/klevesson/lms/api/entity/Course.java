@@ -3,13 +3,21 @@ package com.klevesson.lms.api.entity;
 import java.time.LocalDateTime;
 
 public class Course {
+    
     private Long id;
+
     private String slug;
+
     private String title;
+
     private String description;
+
     private Long lessons;
+
     private Long hours;
+
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
     
     public Course(
