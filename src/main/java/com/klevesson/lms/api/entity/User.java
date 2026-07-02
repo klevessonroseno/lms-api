@@ -18,7 +18,15 @@ public class User {
 
     private LocalDateTime updatedAt;
 
-    public User(Long id, String name, String email, String username, String passwordHash, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(
+        Long id, 
+        String name, 
+        String email, 
+        String username, 
+        String passwordHash, 
+        LocalDateTime createdAt, 
+        LocalDateTime updatedAt
+    ) {
         this.id = id;
         this.name = name;
         this.email = email;
