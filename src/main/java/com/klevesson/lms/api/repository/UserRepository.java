@@ -3,6 +3,7 @@ package com.klevesson.lms.api.repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.springframework.stereotype.Repository;
@@ -21,35 +22,46 @@ public class UserRepository {
 
     public Long save(User user) {
 
-        String sql = "INSERT INTO users (name, email, username, password_hash) VALUES (?, ?, ?, ?)";
+        final String sql = """
+            INSERT INTO users (
+                name, 
+                email, 
+                username, 
+                password_hash
+            ) VALUES (?, ?, ?, ?)
+            """;
 
         try (
             Connection connection = connectionFactory.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement statement = connection.prepareStatement(
+                sql, Statement.RETURN_GENERATED_KEYS
+            );
         ) {
 
-            preparedStatement.setString(1, user.getName());
-            preparedStatement.setString(2, user.getEmail());
-            preparedStatement.setString(3, user.getUsername());
-            preparedStatement.setString(4, user.getPasswordHash());
+            statement.setString(1, user.getName());
+            statement.setString(2, user.getEmail());
+            statement.setString(3, user.getUsername());
+            statement.setString(4, user.getPasswordHash());
             
-            preparedStatement.executeUpdate();
+            int affectedRows = statement.executeUpdate();
 
-            try (
-                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            ) {
-                if (generatedKeys.next()) {
-                    Long id = generatedKeys.getLong(1);
-
-                    return id;
-                }
+            if (affectedRows != 1) {
+                throw new RuntimeException("Something went went wrong.");
             }
 
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao salvar.", e);
-        }
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                
+                if (generatedKeys.next()) {
+                    Long id = generatedKeys.getLong(1);
+                    return id;
+                }
 
-        return null;
+                throw new RuntimeException("Something went wrong. No ID was generated.");
+            }
+
+        } catch (SQLException error) {
+            throw new RuntimeException("Error saving.", error);
+        }
     }
 
 }
