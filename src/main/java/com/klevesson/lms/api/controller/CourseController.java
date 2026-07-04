@@ -25,13 +25,13 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@RequestBody Course course) {
-        Long id = courseRepository.save(course);
+    public ResponseEntity<Void> create(@RequestBody Course course) {
+        Course savedCourse = courseRepository.save(course);
 
         URI uri = ServletUriComponentsBuilder
                     .fromCurrentRequest()
                     .path("/{id}")
-                    .buildAndExpand(id)
+                    .buildAndExpand(savedCourse.getId())
                     .toUri();
         
         return ResponseEntity.created(uri).build();

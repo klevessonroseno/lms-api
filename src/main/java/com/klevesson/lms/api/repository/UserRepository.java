@@ -20,7 +20,7 @@ public class UserRepository {
         this.connectionFactory = connectionFactory;
     }
 
-    public Long save(User user) {
+    public User save(User user) {
 
         final String sql = """
             INSERT INTO users (
@@ -33,17 +33,17 @@ public class UserRepository {
 
         try (
             Connection connection = connectionFactory.getConnection();
-            PreparedStatement statement = connection.prepareStatement(
+            PreparedStatement preparedStatement = connection.prepareStatement(
                 sql, Statement.RETURN_GENERATED_KEYS
             );
         ) {
 
-            statement.setString(1, user.getName());
-            statement.setString(2, user.getEmail());
-            statement.setString(3, user.getUsername());
-            statement.setString(4, user.getPasswordHash());
+            preparedStatement.setString(1, user.getName());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setString(3, user.getUsername());
+            preparedStatement.setString(4, user.getPasswordHash());
             
-            int affectedRows = statement.executeUpdate();
+            int affectedRows = preparedStatement.executeUpdate();
 
             if (affectedRows != 1) {
                 throw new IllegalStateException(
@@ -51,11 +51,14 @@ public class UserRepository {
                 );
             }
 
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+        
                 if (generatedKeys.next()) {
+
                     Long id = generatedKeys.getLong(1);
-                    return id;
+                    user.setId(id);
+
+                    return user;
                 }
 
                 throw new IllegalStateException(
@@ -70,5 +73,4 @@ public class UserRepository {
             );
         }
     }
-
 }

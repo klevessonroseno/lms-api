@@ -25,17 +25,16 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@RequestBody User user) {
+    public ResponseEntity<Void> create(@RequestBody User user) {
 
-        Long id = userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         URI uri = ServletUriComponentsBuilder
                     .fromCurrentRequest()
                     .path("/{id}")
-                    .buildAndExpand(id)
+                    .buildAndExpand(savedUser.getId())
                     .toUri();
                 
         return ResponseEntity.created(uri).build();
     }
-    
 }

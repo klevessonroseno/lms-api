@@ -19,7 +19,7 @@ public class CourseRepository {
         this.connectionFactory = connectionFactory;
     }
 
-    public Long save(Course course) {
+    public Course save(Course course) {
 
         final String sql = """
             INSERT INTO courses (
@@ -33,18 +33,18 @@ public class CourseRepository {
         
         try (
             Connection connection = connectionFactory.getConnection();
-            PreparedStatement statement = connection.prepareStatement(
+            PreparedStatement preparedStatement = connection.prepareStatement(
                 sql, Statement.RETURN_GENERATED_KEYS
             );
         ) {
 
-            statement.setString(1, course.getSlug());
-            statement.setString(2, course.getTitle());
-            statement.setString(3, course.getDescription());
-            statement.setLong(4, course.getLessons());
-            statement.setLong(5, course.getHours());
+            preparedStatement.setString(1, course.getSlug());
+            preparedStatement.setString(2, course.getTitle());
+            preparedStatement.setString(3, course.getDescription());
+            preparedStatement.setLong(4, course.getLessons());
+            preparedStatement.setLong(5, course.getHours());
 
-            int affectedRows = statement.executeUpdate();
+            int affectedRows = preparedStatement.executeUpdate();
 
             if (affectedRows != 1) {
                 throw new IllegalStateException(
@@ -52,11 +52,14 @@ public class CourseRepository {
                 );
             }
 
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
 
                 if (generatedKeys.next()) {
+
                     Long id = generatedKeys.getLong(1);
-                    return id;
+                    course.setId(id);
+                    
+                    return course;
                 }
 
                 throw new IllegalStateException(
