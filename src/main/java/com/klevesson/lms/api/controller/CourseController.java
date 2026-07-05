@@ -8,8 +8,9 @@ import com.klevesson.lms.api.entity.Course;
 import com.klevesson.lms.api.repository.CourseRepository;
 
 import java.net.URI;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -35,6 +36,12 @@ public class CourseController {
                     .toUri();
         
         return ResponseEntity.created(uri).build();
-    }    
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<Course> getOne(@PathVariable Long id) {
+        Course course = courseRepository.findById(id).get();
+        return ResponseEntity.ok().body(course);
+    }
 
 }

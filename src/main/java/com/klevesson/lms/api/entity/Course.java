@@ -1,6 +1,6 @@
 package com.klevesson.lms.api.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class Course {
     
@@ -16,9 +16,9 @@ public class Course {
 
     private Long hours;
 
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
     
     public Course(
         Long id, 
@@ -27,8 +27,8 @@ public class Course {
         String description, 
         Long lessons, 
         Long hours,
-        LocalDateTime createdAt, 
-        LocalDateTime updatedAt
+        Instant createdAt, 
+        Instant updatedAt
     ) {
         this.id = id;
         this.slug = slug;
@@ -39,6 +39,8 @@ public class Course {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public Course() {};
 
     public Long getId() {
         return id;
@@ -88,19 +90,19 @@ public class Course {
         this.hours = hours;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 }
