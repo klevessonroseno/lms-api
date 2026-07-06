@@ -10,3 +10,12 @@ CREATE TABLE courses (
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) STRICT;
+
+UPDATE courses SET
+    slug = " ",
+    title = "",
+    description = "",
+    lessons = 20,
+    hours = 10,
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = 1;

@@ -88,15 +88,49 @@ public class CourseRepository implements CrudRepository<Course, Long> {
         }        
     }
 
-    private Course update(Course course) {
+    public Course update(Course course) {
         
+        final String sql = """
+            UPDATE courses SET
+                slug = ?,
+                title = ?,
+                description = ?,
+                lessons = ?,
+                hours = ?,
+                updated_at = ?
+            WHERE id = ?;
+            """;
+
+        try (
+            Connection connection = connectionFactory.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                sql, Statement.RETURN_GENERATED_KEYS
+            );
+        ) {
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String currentTimeStamp = formatter.format(Instant.now().atZone(ZoneOffset.UTC));
+
+            preparedStatement.setString(1, course.getSlug());
+            preparedStatement.setString(2, course.getTitle());
+            preparedStatement.setString(3, course.getDescription());
+            preparedStatement.setLong(4, course.getLessons());
+            preparedStatement.setLong(5, course.getHours());
+            preparedStatement.setString(6, currentTimeStamp);
+            preparedStatement.setLong(7, course.getId());
+
+            preparedStatement.executeUpdate();
+
+            
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
 
         return null;
     }
 
     @Override
     public Course save(Course entity) {
-        // TODO Auto-generated method stub
         return null;
     } 
 
@@ -168,13 +202,10 @@ public class CourseRepository implements CrudRepository<Course, Long> {
  
     @Override
     public List<Course> findAll() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public void deleteById(Long id) {
-        // TODO Auto-generated method stub
-        
-    }
 
+    }
 }
