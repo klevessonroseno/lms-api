@@ -88,7 +88,7 @@ public class CourseRepository implements CrudRepository<Course, Long> {
         }        
     }
 
-    public Course update(Course course) {
+    private Course update(Course course) {
         
         final String sql = """
             UPDATE courses SET
@@ -109,30 +109,41 @@ public class CourseRepository implements CrudRepository<Course, Long> {
         ) {
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String currentTimeStamp = formatter.format(Instant.now().atZone(ZoneOffset.UTC));
+            Instant now = Instant.now().atZone(ZoneOffset.UTC).toInstant();
+            String formatedNow = formatter.format(Instant.now().atZone(ZoneOffset.UTC));
 
             preparedStatement.setString(1, course.getSlug());
             preparedStatement.setString(2, course.getTitle());
             preparedStatement.setString(3, course.getDescription());
             preparedStatement.setLong(4, course.getLessons());
             preparedStatement.setLong(5, course.getHours());
-            preparedStatement.setString(6, currentTimeStamp);
+            preparedStatement.setString(6, formatedNow);
             preparedStatement.setLong(7, course.getId());
 
-            preparedStatement.executeUpdate();
+            int affectedRows = preparedStatement.executeUpdate();
 
+            if (affectedRows != 1) {
+                throw new IllegalStateException(
+                    "Expected exactly one affected row, but got " + affectedRows + "."
+                );
+            }
+
+            course.setUpdatedAt(now);
+
+            return course;
             
-        } catch (Exception e) {
-            // TODO: handle exception
+        } catch (Exception error) {
+            throw new RuntimeException(
+                "An error occurred while saving.",
+                error
+            );
         }
-
-        return null;
     }
 
     @Override
     public Course save(Course entity) {
-        return null;
-    } 
+        return entity.getId() != null ? update(entity) : create(entity);
+    }
 
     @Override
     public Optional<Course> findById(Long id) {
